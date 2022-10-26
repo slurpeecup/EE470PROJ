@@ -1,0 +1,4 @@
+Running: xsim.dir/BIT5_FROM_LFSR_behav/xsimk -simmode gui -wdb BIT5_FROM_LFSR_behav.wdb -simrunnum 0 -socket 39751
+Design successfully loaded
+Design Loading Memory Usage: 29328 KB (Peak: 29448 KB)
+Design Loading CPU Usage: 30 ms
