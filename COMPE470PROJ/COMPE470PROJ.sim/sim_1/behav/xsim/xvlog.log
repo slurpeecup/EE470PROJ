@@ -5,5 +5,5 @@ INFO: [VRFC 10-311] analyzing module PLAYER
 INFO: [VRFC 10-311] analyzing module PLAYER_TOGGLE
 INFO: [VRFC 10-311] analyzing module GOOD_COMPARE
 INFO: [VRFC 10-311] analyzing module BAD_COMPARE
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/slurpeecup/Documents/COMPE470PROJ/EE470PROJ/COMPE470PROJ/COMPE470PROJ.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module glbl
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/slurpeecup/Documents/COMPE470PROJ/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/TB_1.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module TB_1
