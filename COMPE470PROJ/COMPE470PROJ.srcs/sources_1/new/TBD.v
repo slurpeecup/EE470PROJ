@@ -79,14 +79,48 @@ end
 endmodule
 
 
-module BAD_COMPARE();
+module BAD_COMPARE
+(input [31:0] HOTFROMLFSR, [31:0] PLAYER1IN, 
+[31:0] PLAYER2IN, input TOG, CLK, output reg MISS); /// CLK should actually be RST
+
+reg internal_HOLD; 
+reg [31:0] CURRENT_PLAYER; 
+
+
+always @ (CURRENT_PLAYER) 
+begin
+if (internal_HOLD != CURRENT_PLAYER)
+begin
+MISS = 1'b1; 
+internal_HOLD = CURRENT_PLAYER; #0.01;
+MISS = 1'b0;
+if (!TOG) CURRENT_PLAYER <= PLAYER1IN;
+else if (TOG) CURRENT_PLAYER <= PLAYER2IN;
+end end
+
+always @ (posedge CLK) 
+begin MISS <= 1'b0; 
+internal_HOLD <= HOTFROMLFSR;
+if (!TOG) assign CURRENT_PLAYER = PLAYER1IN;
+else if (TOG) assign CURRENT_PLAYER = PLAYER2IN;
+end // force reset per cycle
+
 endmodule 
 
 
+module SCORE_COUNTER(input MISS, HIT, TOG, output reg [5:0]SCORE);
 
+always @ (MISS) 
+begin 
+if (SCORE == 0) begin SCORE = 1; end  //force up and bring down, prevent underflow
+SCORE = SCORE -1; 
+end
 
-
-
+always @ (HIT) 
+begin
+SCORE = SCORE  + 1;
+end
+endmodule
 
 
 
