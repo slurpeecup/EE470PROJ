@@ -28,7 +28,7 @@ output wire [4:0] B5IN;
 reg HOLD = 1'b0;
 
 integer i;
-always @ (posedge CLK or posedge RST)  
+always @ (posedge CLK)  
 
 if (LOAD) OUT <= DATA;
 
@@ -60,10 +60,7 @@ always @ (*)
 begin PLAYEROUT <= intake; end
 endmodule
 
-module PLAYER_TOGGLE (input RST, output reg TOG);
-/// TOG MUST BE LOADED AT INITIAL 
-always @ (posedge RST) TOG = ~RST;
-endmodule
+
 
 module GOOD_COMPARE (input [31:0] HOTFROMLFSR, [31:0] PLAYER1IN, [31:0] PLAYER2IN, input TOG, output reg HIT);
 always @ (*) begin
@@ -81,12 +78,11 @@ endmodule
 module BAD_COMPARE
 (input [31:0] HOTFROMLFSR, [31:0] PLAYER1IN, 
 [31:0] PLAYER2IN, input TOG, RST, output reg MISS,
-HIT, output reg [31:0] PLAYERX); /// CLK should actually be RST
+HIT); /// CLK should actually be RST
 
 reg internal_HOLD; 
 reg [31:0] CURRENT_PLAYER; 
 
-always @(*) begin assign PLAYERX = CURRENT_PLAYER; end
 
 always @ (CURRENT_PLAYER) 
 begin
@@ -114,8 +110,8 @@ begin
 MISS <= 1'b0; 
 HIT <= 1'b0;
 internal_HOLD <= HOTFROMLFSR;
-if (!TOG) assign CURRENT_PLAYER = PLAYER1IN;
-else if (TOG) assign CURRENT_PLAYER = PLAYER2IN;
+if (!TOG)  CURRENT_PLAYER = PLAYER1IN;
+else if (TOG)  CURRENT_PLAYER = PLAYER2IN;
 end // force reset per cycle
 
 endmodule 
@@ -175,7 +171,7 @@ end
 
 end
 
-always @ (posedge ROUND_SCORE)
+always @ (ROUND_SCORE)
 begin
 TOTAL_SCORE <= TOTAL_SCORE + ROUND_SCORE;
 end
@@ -208,14 +204,14 @@ begin
     begin
         if (TOG == 0) 
         begin
-            assign RST_INTERNAL_PLAYER = TOTAL_SCORE_1;
-            assign RST_INTERNAL_TOG = 0; 
+             RST_INTERNAL_PLAYER = TOTAL_SCORE_1;
+             RST_INTERNAL_TOG = 0; 
         end
         
         else if (TOG == 1) 
         begin
-            assign RST_INTERNAL_PLAYER = TOTAL_SCORE_2;
-            assign RST_INTERNAL_TOG = 1; 
+             RST_INTERNAL_PLAYER = TOTAL_SCORE_2;
+             RST_INTERNAL_TOG = 1; 
         end
         
        
@@ -246,28 +242,28 @@ endmodule
 
 
 module WHACK_THAT_MOLE(input [31:0] PLAYER1IN, PLAYER2IN, 
-DATA, input CLK, LOAD, output reg [31:0] SCORE_OUT_P1, SCORE_OUT_P2);
-reg RST;
-reg [5:0] B5IN;
-reg [31:0] HOTFROMLFSR;
-reg [31:0] PLAYERX;
+DATA, input CLK, LOAD, output wire [31:0] SCORE_OUT_P1, SCORE_OUT_P2);
 
-reg MISS;
-reg HIT;
+reg TOG;
+wire [5:0] B5IN;
+wire [31:0] HOTFROMLFSR;
+wire RST;
+wire MISS;
+wire HIT;
 
-reg[5:0] SCORE;
-reg[5:0] SCORE_P1;
-reg[5:0] SCORE_P2;
+wire[5:0] SCORE;
+wire[5:0] SCORE_P1;
+wire[5:0] SCORE_P2;
 
 
 LFSR_32BIT LFSR32B (.CLK(CLK), .LOAD(LOAD), .RST(RST), .DATA(DATA), .OUT(OUT), .B5IN(B5IN));
 
-BIT_FROM_LFSR B5FLFSR (.B5IN(B5IN), .HOTFROMLFSR(HOTFROMLFSR));
+BIT5_FROM_LFSR B5FLFSR (.B5IN(B5IN), .HOTFROMLFSR(HOTFROMLFSR));
 
-PLAYER_TOGGLE PTOG (.RST(RST), .TOG(TOG));
+//PLAYER_TOGGLE PTOG (.RST(RST), .TOG(TOG));
 
 BAD_COMPARE BCC (.HOTFROMLFSR(HOTFROMLFSR),.PLAYER1IN(PLAYER1IN),
-.PLAYER2IN(PLAYER2IN),.TOG(TOG),.RST(RST),.MISS(MISS),.HIT(HIT),.PLAYERX(PLAYERX));
+.PLAYER2IN(PLAYER2IN),.TOG(TOG),.RST(RST),.MISS(MISS),.HIT(HIT));
 
 TURN_SCORE_COUNTER TSC (.MISS(MISS), .HIT(HIT),.TOG(TOG),.LOAD(LOAD),.SCORE(SCORE));
 
@@ -275,8 +271,9 @@ SCORE_DEMUX SCD (.TOG(TOG),.RST(RST),.SCORE(SCORE),.SCORE_P1(SCORE_P1),.SCORE_P2
 
 SCORE_REGISTER PLY1 (.LOAD(LOAD),.ROUND_SCORE(SCORE_P1),.TOTAL_SCORE(SCORE_OUT_P1));
 SCORE_REGISTER PLY2 (.LOAD(LOAD),.ROUND_SCORE(SCORE_P2),.TOTAL_SCORE(SCORE_OUT_P2));
-
 RST_DRIVER ( .TOTAL_SCORE_1(SCORE_OUT_P1), 
-.TOTAL_SCORE_2(SCORE_OUT_P2), .LOAD(LOAD), .TOG(TOG), .CLK(CLK), .RST(RST))
+.TOTAL_SCORE_2(SCORE_OUT_P2), .LOAD(LOAD), .TOG(TOG), .CLK(CLK), .RST(RST));
+
+always @ (RST) TOG = ~RST;
 
 endmodule

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GenRun Id="synth_1" LaunchPart="xc7k70tfbv676-1" LaunchTime="1670190350" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/BIT5_FROM_LFSR.dcp">
-  <File Type="PA-TCL" Name="BIT5_FROM_LFSR.tcl"/>
-  <File Type="REPORTS-TCL" Name="BIT5_FROM_LFSR_reports.tcl"/>
-  <File Type="RDS-RDS" Name="BIT5_FROM_LFSR.vds"/>
-  <File Type="RDS-UTIL" Name="BIT5_FROM_LFSR_utilization_synth.rpt"/>
-  <File Type="RDS-UTIL-PB" Name="BIT5_FROM_LFSR_utilization_synth.pb"/>
-  <File Type="RDS-DCP" Name="BIT5_FROM_LFSR.dcp"/>
+<GenRun Id="synth_1" LaunchPart="xc7k70tfbv676-1" LaunchTime="1670280367" LaunchIncrCheckpoint="$PSRCDIR/utils_1/imports/synth_1/BIT5_FROM_LFSR.dcp">
+  <File Type="PA-TCL" Name="WHACK_THAT_MOLE.tcl"/>
+  <File Type="RDS-PROPCONSTRS" Name="WHACK_THAT_MOLE_drc_synth.rpt"/>
+  <File Type="REPORTS-TCL" Name="WHACK_THAT_MOLE_reports.tcl"/>
+  <File Type="RDS-RDS" Name="WHACK_THAT_MOLE.vds"/>
+  <File Type="RDS-UTIL" Name="WHACK_THAT_MOLE_utilization_synth.rpt"/>
+  <File Type="RDS-UTIL-PB" Name="WHACK_THAT_MOLE_utilization_synth.pb"/>
+  <File Type="RDS-DCP" Name="WHACK_THAT_MOLE.dcp"/>
+  <File Type="VDS-TIMINGSUMMARY" Name="WHACK_THAT_MOLE_timing_summary_synth.rpt"/>
+  <File Type="VDS-TIMING-PB" Name="WHACK_THAT_MOLE_timing_summary_synth.pb"/>
   <FileSet Name="sources" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1" RelGenDir="$PGENDIR/sources_1">
     <Filter Type="Srcs"/>
     <File Path="$PSRCDIR/sources_1/new/TBD.v">
@@ -17,7 +20,7 @@
     </File>
     <Config>
       <Option Name="DesignMode" Val="RTL"/>
-      <Option Name="TopModule" Val="BIT5_FROM_LFSR"/>
+      <Option Name="TopModule" Val="WHACK_THAT_MOLE"/>
       <Option Name="TopAutoSet" Val="TRUE"/>
     </Config>
   </FileSet>
@@ -42,7 +45,9 @@
     </Config>
   </FileSet>
   <Strategy Version="1" Minor="2">
-    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2022"/>
+    <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2022">
+      <Desc>Vivado Synthesis Defaults</Desc>
+    </StratHandle>
     <Step Id="synth_design"/>
   </Strategy>
 </GenRun>

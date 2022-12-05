@@ -40,4 +40,4 @@ EAStep()
      fi
 }
 
-EAStep vivado -log BIT5_FROM_LFSR.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source BIT5_FROM_LFSR.tcl
+EAStep vivado -log WHACK_THAT_MOLE.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source WHACK_THAT_MOLE.tcl
