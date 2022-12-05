@@ -5,5 +5,6 @@ INFO: [VRFC 10-311] analyzing module PLAYER
 INFO: [VRFC 10-311] analyzing module PLAYER_TOGGLE
 INFO: [VRFC 10-311] analyzing module GOOD_COMPARE
 INFO: [VRFC 10-311] analyzing module BAD_COMPARE
+INFO: [VRFC 10-311] analyzing module SCORE_COUNTER
 INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/compare_TB.v" into library xil_defaultlib
 INFO: [VRFC 10-311] analyzing module compare_TB

@@ -81,22 +81,30 @@ endmodule
 
 module BAD_COMPARE
 (input [31:0] HOTFROMLFSR, [31:0] PLAYER1IN, 
-[31:0] PLAYER2IN, input TOG, CLK, output reg MISS); /// CLK should actually be RST
+[31:0] PLAYER2IN, input TOG, CLK, output reg MISS,output reg [31:0] PLAYERX); /// CLK should actually be RST
 
 reg internal_HOLD; 
 reg [31:0] CURRENT_PLAYER; 
 
+always @(*) begin assign PLAYERX = CURRENT_PLAYER; end
 
 always @ (CURRENT_PLAYER) 
 begin
+if (CURRENT_PLAYER != HOTFROMLFSR)  
+begin
+
 if (internal_HOLD != CURRENT_PLAYER)
 begin
 MISS = 1'b1; 
-internal_HOLD = CURRENT_PLAYER; #0.01;
+internal_HOLD = CURRENT_PLAYER; #0.5;
 MISS = 1'b0;
+
 if (!TOG) CURRENT_PLAYER <= PLAYER1IN;
 else if (TOG) CURRENT_PLAYER <= PLAYER2IN;
-end end
+
+end 
+end 
+end
 
 always @ (posedge CLK) 
 begin MISS <= 1'b0; 

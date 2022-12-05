@@ -20,7 +20,20 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module counter_TB(
+module counter_TB();
 
-    );
+reg MISS, HIT, TOG;
+
+wire [5:0] SCORE;
+
+SCORE_COUNTER SCC (.MISS(MISS),.HIT(HIT),.TOG(TOG),.SCORE(SCORE));
+
+
+initial 
+begin
+
+
+end
+
+
 endmodule
