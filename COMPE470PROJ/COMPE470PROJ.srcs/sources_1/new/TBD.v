@@ -124,7 +124,6 @@ endmodule
 module TURN_SCORE_COUNTER(input MISS, HIT, TOG,LOAD, output reg [5:0]SCORE); // #CLK should be RST for player change triggers
 
 //reg internal_MISS_HOLD, internal_HIT_HOLD;
-
 always @ (posedge MISS) 
 begin 
 if (SCORE == 0) 
@@ -133,7 +132,6 @@ SCORE = 1; //force up and bring low, prevent underflow
 end  
 SCORE = SCORE -1; 
 end
-
 always @ (posedge HIT) 
 begin
 SCORE = SCORE  + 1;
@@ -148,7 +146,7 @@ end
 endmodule
 
 
-module SCORE_DEMUX (input TOG, [5:0]SCORE, output reg [5:0] SCORE_P1, SCORE_P2 );
+module SCORE_DEMUX (input TOG, CLK, [5:0]SCORE,  output reg [5:0] SCORE_P1, SCORE_P2 );
 always @ (*)
 begin
 
@@ -174,9 +172,11 @@ if (LOAD == 1'b1)
 begin 
 TOTAL_SCORE <= {5{1'b0}};
 end
+
+
 end
 
-always @ (posedge CLK)
+always @ (posedge ROUND_SCORE)
 begin
 TOTAL_SCORE <= TOTAL_SCORE + ROUND_SCORE;
 end
