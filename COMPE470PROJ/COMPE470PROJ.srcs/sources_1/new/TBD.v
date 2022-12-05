@@ -80,7 +80,7 @@ endmodule
 
 module BAD_COMPARE
 (input [31:0] HOTFROMLFSR, [31:0] PLAYER1IN, 
-[31:0] PLAYER2IN, input TOG, CLK, output reg MISS,
+[31:0] PLAYER2IN, input TOG, RST, output reg MISS,
 HIT, output reg [31:0] PLAYERX); /// CLK should actually be RST
 
 reg internal_HOLD; 
@@ -109,7 +109,7 @@ end
 end 
 end
 
-always @ (posedge CLK) 
+always @ (posedge RST) 
 begin 
 MISS <= 1'b0; 
 HIT <= 1'b0;
@@ -146,7 +146,7 @@ end
 endmodule
 
 
-module SCORE_DEMUX (input TOG, CLK, [5:0]SCORE,  output reg [5:0] SCORE_P1, SCORE_P2 );
+module SCORE_DEMUX (input TOG, RST, [5:0]SCORE,  output reg [5:0] SCORE_P1, SCORE_P2 );
 always @ (*)
 begin
 
@@ -165,14 +165,13 @@ end
 end
 endmodule
 
-module SCORE_REGISTER(input LOAD, CLK, [5:0] ROUND_SCORE, output reg [5:0] TOTAL_SCORE);
+module SCORE_REGISTER(input LOAD, [5:0] ROUND_SCORE, output reg [5:0] TOTAL_SCORE);
 always @ (*) 
 begin
 if (LOAD == 1'b1)
 begin 
 TOTAL_SCORE <= {5{1'b0}};
 end
-
 
 end
 
@@ -184,16 +183,100 @@ end
 endmodule
 
 
+module RST_DRIVER
+(input [5:0] TOTAL_SCORE_1, TOTAL_SCORE_2, 
+input LOAD, TOG, CLK, output reg RST);
+
+reg [5:0] RST_INTERNAL_PLAYER;
+reg [5:0]HARD_LIMIT;
+reg [5:0] RST_INTERNAL_COUNTER;
+
+reg RST_INTERNAL_TOG;
+reg INTERNAL_RST;
 
 
+always @ (*)
+begin
+    if (LOAD == 1)
+    begin 
+        RST_INTERNAL_PLAYER <= {5{1'b0}};
+        RST_INTERNAL_TOG <=0;
+        RST_INTERNAL_COUNTER <= 0;
+        
+    end
+    else if (LOAD == 0) 
+    begin
+        if (TOG == 0) 
+        begin
+            assign RST_INTERNAL_PLAYER = TOTAL_SCORE_1;
+            assign RST_INTERNAL_TOG = 0; 
+        end
+        
+        else if (TOG == 1) 
+        begin
+            assign RST_INTERNAL_PLAYER = TOTAL_SCORE_2;
+            assign RST_INTERNAL_TOG = 1; 
+        end
+        
+       
+        if (RST_INTERNAL_PLAYER >= 3)
+            begin HARD_LIMIT = 20; end
+        else if (RST_INTERNAL_PLAYER >= 6) 
+            begin HARD_LIMIT = 15; end
+        else if (RST_INTERNAL_PLAYER >= 7) 
+            begin HARD_LIMIT = 10; end
 
 
-module RST_DRIVER();
+        if (RST_INTERNAL_COUNTER == HARD_LIMIT)
+        begin
+        RST = 1; #5; RST = 0;
+        RST_INTERNAL_COUNTER = 0;
+        end
+        
+end end
+
+
+always @ (posedge CLK)
+begin
+RST_INTERNAL_COUNTER = RST_INTERNAL_COUNTER + 1;
+end
 
 
 endmodule
 
 
+module WHACK_THAT_MOLE(input [31:0] PLAYER1IN, PLAYER2IN, 
+DATA, input CLK, LOAD, output reg [31:0] SCORE_OUT_P1, SCORE_OUT_P2);
+reg RST;
+reg [5:0] B5IN;
+reg [31:0] HOTFROMLFSR;
+reg [31:0] PLAYERX;
+
+reg MISS;
+reg HIT;
+
+reg[5:0] SCORE;
+reg[5:0] SCORE_P1;
+reg[5:0] SCORE_P2;
 
 
+LFSR_32BIT LFSR32B (.CLK(CLK), .LOAD(LOAD), .RST(RST), .DATA(DATA), .OUT(OUT), .B5IN(B5IN));
 
+BIT_FROM_LFSR B5FLFSR (.B5IN(B5IN), .HOTFROMLFSR(HOTFROMLFSR));
+
+PLAYER_TOGGLE PTOG (.RST(RST), .TOG(TOG));
+
+BAD_COMPARE BCC (.HOTFROMLFSR(HOTFROMLFSR),.PLAYER1IN(PLAYER1IN),
+.PLAYER2IN(PLAYER2IN),.TOG(TOG),.RST(RST),.MISS(MISS),.HIT(HIT),.PLAYERX(PLAYERX));
+
+TURN_SCORE_COUNTER TSC (.MISS(MISS), .HIT(HIT),.TOG(TOG),.LOAD(LOAD),.SCORE(SCORE));
+
+SCORE_DEMUX SCD (.TOG(TOG),.RST(RST),.SCORE(SCORE),.SCORE_P1(SCORE_P1),.SCORE_P2(SCORE_P2));
+
+SCORE_REGISTER PLY1 (.LOAD(LOAD),.ROUND_SCORE(SCORE_P1),.TOTAL_SCORE(SCORE_OUT_P1));
+SCORE_REGISTER PLY2 (.LOAD(LOAD),.ROUND_SCORE(SCORE_P2),.TOTAL_SCORE(SCORE_OUT_P2));
+
+RST_DRIVER ( .TOTAL_SCORE_1(SCORE_OUT_P1), 
+.TOTAL_SCORE_2(SCORE_OUT_P2), .LOAD(LOAD), .TOG(TOG), .CLK(CLK), .RST(RST))
+
+endmodule
