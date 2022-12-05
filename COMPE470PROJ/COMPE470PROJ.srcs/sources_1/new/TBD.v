@@ -72,7 +72,6 @@ if (!TOG)
 HIT = PLAYER1IN && HOTFROMLFSR;
 
 else if (TOG)
-
 HIT = PLAYER2IN && HOTFROMLFSR;
 end
 
@@ -81,7 +80,8 @@ endmodule
 
 module BAD_COMPARE
 (input [31:0] HOTFROMLFSR, [31:0] PLAYER1IN, 
-[31:0] PLAYER2IN, input TOG, CLK, output reg MISS,output reg [31:0] PLAYERX); /// CLK should actually be RST
+[31:0] PLAYER2IN, input TOG, CLK, output reg MISS,
+HIT, output reg [31:0] PLAYERX); /// CLK should actually be RST
 
 reg internal_HOLD; 
 reg [31:0] CURRENT_PLAYER; 
@@ -90,6 +90,9 @@ always @(*) begin assign PLAYERX = CURRENT_PLAYER; end
 
 always @ (CURRENT_PLAYER) 
 begin
+if (CURRENT_PLAYER == HOTFROMLFSR) 
+begin HIT = 1'b1; end 
+
 if (CURRENT_PLAYER != HOTFROMLFSR)  
 begin
 
@@ -107,7 +110,9 @@ end
 end
 
 always @ (posedge CLK) 
-begin MISS <= 1'b0; 
+begin 
+MISS <= 1'b0; 
+HIT <= 1'b0;
 internal_HOLD <= HOTFROMLFSR;
 if (!TOG) assign CURRENT_PLAYER = PLAYER1IN;
 else if (TOG) assign CURRENT_PLAYER = PLAYER2IN;
@@ -116,22 +121,77 @@ end // force reset per cycle
 endmodule 
 
 
-module SCORE_COUNTER(input MISS, HIT, TOG, output reg [5:0]SCORE);
+module TURN_SCORE_COUNTER(input MISS, HIT, TOG,LOAD, output reg [5:0]SCORE); // #CLK should be RST for player change triggers
 
-always @ (MISS) 
+//reg internal_MISS_HOLD, internal_HIT_HOLD;
+
+always @ (posedge MISS) 
 begin 
-if (SCORE == 0) begin SCORE = 1; end  //force up and bring down, prevent underflow
+if (SCORE == 0) 
+begin 
+SCORE = 1; //force up and bring low, prevent underflow
+end  
 SCORE = SCORE -1; 
 end
 
-always @ (HIT) 
+always @ (posedge HIT) 
 begin
 SCORE = SCORE  + 1;
 end
+
+always @ (*) begin
+if (LOAD == 1) begin
+SCORE = {6{1'b0}}; 
+end
+end
+
+endmodule
+
+
+module SCORE_DEMUX (input TOG, [5:0]SCORE, output reg [5:0] SCORE_P1, SCORE_P2 );
+always @ (*)
+begin
+
+if (TOG == 0) 
+begin
+SCORE_P1 <= SCORE;
+SCORE_P2 <= {5{1'b0}};
+end
+
+else if (TOG == 1'b1) 
+begin
+SCORE_P2 <= SCORE;
+SCORE_P1 <= {5{1'b0}};
+end
+
+end
+endmodule
+
+module SCORE_REGISTER(input LOAD, CLK, [5:0] ROUND_SCORE, output reg [5:0] TOTAL_SCORE);
+always @ (*) 
+begin
+if (LOAD == 1'b1)
+begin 
+TOTAL_SCORE <= {5{1'b0}};
+end
+end
+
+always @ (posedge CLK)
+begin
+TOTAL_SCORE <= TOTAL_SCORE + ROUND_SCORE;
+end
+
 endmodule
 
 
 
+
+
+
+module RST_DRIVER();
+
+
+endmodule
 
 
 

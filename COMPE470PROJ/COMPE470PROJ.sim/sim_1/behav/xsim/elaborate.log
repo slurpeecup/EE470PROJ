@@ -9,6 +9,9 @@ Starting simulation data flow analysis
 Completed simulation data flow analysis
 Time Resolution for simulation is 1ps
 Compiling module xil_defaultlib.BAD_COMPARE
+Compiling module xil_defaultlib.TURN_SCORE_COUNTER
+Compiling module xil_defaultlib.SCORE_DEMUX
+Compiling module xil_defaultlib.SCORE_REGISTER
 Compiling module xil_defaultlib.compare_TB
 Compiling module xil_defaultlib.glbl
 Built simulation snapshot compare_TB_behav
