@@ -8,5 +8,5 @@ INFO: [VRFC 10-311] analyzing module SCORE_DEMUX
 INFO: [VRFC 10-311] analyzing module SCORE_REGISTER
 INFO: [VRFC 10-311] analyzing module RST_DRIVER
 INFO: [VRFC 10-311] analyzing module WHACK_THAT_MOLE
-INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/counter_TB.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module RST_DRIVER_TB
+INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/compare_TB.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module compare_TB
