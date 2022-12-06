@@ -61,19 +61,6 @@ endmodule
 
 
 
-module GOOD_COMPARE (input [31:0] HOTFROMLFSR, [31:0] PLAYER1IN, [31:0] PLAYER2IN, input TOG, output reg HIT);
-always @ (*) begin
-
-if (!TOG) 
-HIT = PLAYER1IN && HOTFROMLFSR;
-
-else if (TOG)
-HIT = PLAYER2IN && HOTFROMLFSR;
-end
-
-endmodule
-
-
 module BAD_COMPARE
 (input [31:0] HOTFROMLFSR, [31:0] PLAYER1IN, 
 [31:0] PLAYER2IN, input TOG, RST, output reg MISS,
@@ -85,35 +72,28 @@ reg [31:0] CURRENT_PLAYER;
 
 always @ (*) 
 begin
-if (CURRENT_PLAYER == HOTFROMLFSR) 
-begin HIT 
-<= 1'b1; 
-end 
+    MISS = 1'b0; 
+    HIT = 1'b0; 
+    
+   if (TOG == 1'b0)  CURRENT_PLAYER = PLAYER1IN;
+    else if (TOG == 1'b1)  CURRENT_PLAYER = PLAYER2IN;
+    
+    if (CURRENT_PLAYER == HOTFROMLFSR) 
+    begin 
+        HIT = 1'b1; 
+    end
+    else 
+        begin 
+        MISS = 1'b1; 
+        end  
 
-if (CURRENT_PLAYER != HOTFROMLFSR)  
-begin
-
-if (internal_HOLD != CURRENT_PLAYER)
-begin
-MISS = 1'b1; #2.5;
-internal_HOLD = CURRENT_PLAYER; #2.5;
-MISS <= 1'b0;
-
-if (!TOG) CURRENT_PLAYER <= PLAYER1IN;
-else if (TOG) CURRENT_PLAYER <= PLAYER2IN;
-
-end 
-end 
 end
 
-always @ (posedge RST) 
-begin 
-MISS <= 1'b0; 
-HIT <= 1'b0;
-internal_HOLD <= HOTFROMLFSR;
-if (!TOG)  CURRENT_PLAYER = PLAYER1IN;
-else if (TOG)  CURRENT_PLAYER = PLAYER2IN;
+always @ (posedge RST or negedge RST) 
+    begin 
+    internal_HOLD = HOTFROMLFSR;   
 end // force reset per cycle
+
 
 endmodule 
 
@@ -121,21 +101,17 @@ endmodule
 module TURN_SCORE_COUNTER(input MISS, HIT, TOG,LOAD, output reg [5:0]SCORE); // #CLK should be RST for player change triggers
 
 //reg internal_MISS_HOLD, internal_HIT_HOLD;
-always @ (posedge MISS) 
-begin 
-if (SCORE == 0) 
-begin 
-SCORE = 1; //force up and bring low, prevent underflow
-end  
-SCORE = SCORE -1; 
-end
-always @ (posedge HIT) 
+always @ (TOG)
 begin
-SCORE = SCORE  + 1;
+if (MISS == HIT) begin SCORE = 5'b00000; end 
+if (MISS > HIT) begin SCORE = 5'b00000; end
+if (MISS < HIT) begin SCORE = 5'b00001; end
 end
 
-always @ (*) begin
-if (LOAD == 1) begin
+always @ (*) 
+begin
+if (LOAD == 1) 
+begin
 SCORE = {6{1'b0}}; 
 end
 end
@@ -144,22 +120,20 @@ endmodule
 
 
 module SCORE_DEMUX (input TOG, RST, [5:0]SCORE,  output reg [5:0] SCORE_P1, SCORE_P2 );
-always @ (*)
-begin
 
-if (TOG == 0) 
-begin
-SCORE_P1 <= SCORE;
-SCORE_P2 <= {5{1'b0}};
-end
-
-else if (TOG == 1'b1) 
+always @ (posedge TOG)
 begin
 SCORE_P2 <= SCORE;
 SCORE_P1 <= {5{1'b0}};
 end
 
+always @ (negedge TOG)
+begin 
+
+SCORE_P1 <= SCORE;
+SCORE_P2 <= {5{1'b0}};
 end
+
 endmodule
 
 module SCORE_REGISTER(input LOAD, [5:0] ROUND_SCORE, output reg [5:0] TOTAL_SCORE);
@@ -185,58 +159,68 @@ module RST_DRIVER
 input LOAD, TOG, CLK, output reg RST);
 
 reg [5:0] RST_INTERNAL_PLAYER;
-reg [5:0]HARD_LIMIT;
+reg [5:0] HARD_LIMIT;
 reg [5:0] RST_INTERNAL_COUNTER;
 
 reg RST_INTERNAL_TOG;
 reg INTERNAL_RST;
 
 
-always @ (*)
-begin
-    if (LOAD == 1)
+
+always @ (posedge LOAD)
+begin 
+
     begin 
-        RST_INTERNAL_PLAYER <= {5{1'b0}};
-        RST_INTERNAL_TOG <=0;
-        RST_INTERNAL_COUNTER <= 0;
-        
+        RST_INTERNAL_PLAYER = {5{1'b0}};
+        RST_INTERNAL_TOG =0;
+        RST_INTERNAL_COUNTER = 0;
+        RST = 1'b0; 
     end
-    else if (LOAD == 0) 
+
+end
+
+always @ (posedge TOG or negedge TOG)
+begin
+    
+    if (LOAD == 0) 
     begin
         if (TOG == 0) 
         begin
-             RST_INTERNAL_PLAYER = TOTAL_SCORE_1;
-             RST_INTERNAL_TOG = 0; 
+             RST_INTERNAL_PLAYER = TOTAL_SCORE_1; 
         end
         
-        else if (TOG == 1) 
+        if (TOG == 1) 
         begin
              RST_INTERNAL_PLAYER = TOTAL_SCORE_2;
-             RST_INTERNAL_TOG = 1; 
         end
-        
-       
-        if (RST_INTERNAL_PLAYER >= 3)
-            begin HARD_LIMIT = 20; end
-        else if (RST_INTERNAL_PLAYER >= 6) 
-            begin HARD_LIMIT = 15; end
-        else if (RST_INTERNAL_PLAYER >= 7) 
-            begin HARD_LIMIT = 10; end
-
-
-        if (RST_INTERNAL_COUNTER == HARD_LIMIT)
-        begin
-        RST = 1; #5; RST = 0;
-        RST_INTERNAL_COUNTER = 0;
-        end
-        
-end end
-
-
-always @ (posedge CLK)
-begin 
-RST_INTERNAL_COUNTER = RST_INTERNAL_COUNTER + 1;
+          
+end 
 end
+
+always @ (*) begin
+     if (RST_INTERNAL_PLAYER <= 3)
+            begin 
+                HARD_LIMIT = 10; 
+            end
+        else if (RST_INTERNAL_PLAYER >= 6) 
+            begin 
+                HARD_LIMIT = 7; 
+            end
+        else if (RST_INTERNAL_PLAYER >= 7) 
+            begin 
+                HARD_LIMIT = 5; 
+            end
+end
+
+always @ (posedge CLK) begin
+RST_INTERNAL_COUNTER <= RST_INTERNAL_COUNTER + 1;
+if (RST_INTERNAL_COUNTER >= HARD_LIMIT)
+        begin    
+        RST_INTERNAL_COUNTER <= 0;
+        RST <= ~RST;
+        end
+end
+
 
 
 endmodule
