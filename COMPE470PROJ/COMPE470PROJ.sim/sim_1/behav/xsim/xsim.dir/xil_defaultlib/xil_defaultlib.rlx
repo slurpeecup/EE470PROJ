@@ -3,6 +3,6 @@
 Oct 14 2022
 05:20:55
 C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.sim/sim_1/behav/xsim/glbl.v,1670121392,verilog,,,,glbl,,,,,,,,
-C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/TB_1.v,1670148119,verilog,,,,TB_1,,,,,,,,
-C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/compare_TB.v,1670242951,verilog,,,,compare_TB,,,,,,,,
-C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sources_1/new/TBD.v,1670280214,verilog,,C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/compare_TB.v,,BAD_COMPARE;BIT5_FROM_LFSR;GOOD_COMPARE;LFSR_32BIT;PLAYER;RST_DRIVER;SCORE_DEMUX;SCORE_REGISTER;TURN_SCORE_COUNTER;WHACK_THAT_MOLE,,,,,,,,
+C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/TB_1.v,1670303232,verilog,,,,TB_1,,,,,,,,
+C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/compare_TB.v,1670280798,verilog,,,,compare_TB,,,,,,,,
+C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sources_1/new/TBD.v,1670303622,verilog,,C:/Users/z434/OneDrive/Documents/Vivado Projects/EE470PROJ/COMPE470PROJ/COMPE470PROJ.srcs/sim_1/new/TB_1.v,,BAD_COMPARE;BIT5_FROM_LFSR;GOOD_COMPARE;LFSR_32BIT;PLAYER;RST_DRIVER;SCORE_DEMUX;SCORE_REGISTER;TURN_SCORE_COUNTER;WHACK_THAT_MOLE,,,,,,,,

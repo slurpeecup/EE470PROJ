@@ -25,7 +25,6 @@ reg [31:0] LFSRHOT;
 reg [31:0] PLAYER1IN;
 reg [31:0] PLAYER2IN; 
 reg TOG, RST, LOAD;
-wire [31:0] PLAYERX;
 wire MISS, HIT;
 
 wire [5:0] SCORE;

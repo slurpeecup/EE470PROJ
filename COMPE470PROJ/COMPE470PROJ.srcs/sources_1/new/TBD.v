@@ -23,26 +23,25 @@ module LFSR_32BIT(CLK, LOAD, RST, DATA, OUT, B5IN);
 input CLK, LOAD, RST;
 input [31:0] DATA;
 output reg [31:0] OUT;
-output wire [4:0] B5IN;
+output reg [4:0] B5IN;
 
 reg HOLD = 1'b0;
 
 integer i;
-always @ (posedge CLK)  
-
+always @ (posedge CLK or posedge LOAD)  
 if (LOAD) OUT <= DATA;
-
-else if (!LOAD) begin 
-////polynomial: x31, x30, x10, x0 
-HOLD <= (OUT[31]^(OUT[30]^(OUT[10]^OUT[0])));
-for (i = 30; i > 0; i = i-1) 
+else if (!LOAD)
 begin
-OUT [i] <= OUT [i + 1];
+////polynomial: x31, x30, x10, x0
+HOLD <= (OUT[31]^(OUT[30]^(OUT[10]^OUT[0])));
+for (i = 30; i > 0; i = i-1) begin OUT [i] <= OUT [i + 1]; end
+OUT [31] <= HOLD; 
+
+B5IN <= OUT; 
 
 end
-OUT [31] <= HOLD;
-end
-assign B5IN = OUT [4:0];
+
+
 endmodule
 
 
@@ -84,19 +83,21 @@ reg internal_HOLD;
 reg [31:0] CURRENT_PLAYER; 
 
 
-always @ (CURRENT_PLAYER) 
+always @ (*) 
 begin
 if (CURRENT_PLAYER == HOTFROMLFSR) 
-begin HIT = 1'b1; end 
+begin HIT 
+<= 1'b1; 
+end 
 
 if (CURRENT_PLAYER != HOTFROMLFSR)  
 begin
 
 if (internal_HOLD != CURRENT_PLAYER)
 begin
-MISS = 1'b1; 
-internal_HOLD = CURRENT_PLAYER; #0.5;
-MISS = 1'b0;
+MISS = 1'b1; #2.5;
+internal_HOLD = CURRENT_PLAYER; #2.5;
+MISS <= 1'b0;
 
 if (!TOG) CURRENT_PLAYER <= PLAYER1IN;
 else if (TOG) CURRENT_PLAYER <= PLAYER2IN;
@@ -233,7 +234,7 @@ end end
 
 
 always @ (posedge CLK)
-begin
+begin 
 RST_INTERNAL_COUNTER = RST_INTERNAL_COUNTER + 1;
 end
 
